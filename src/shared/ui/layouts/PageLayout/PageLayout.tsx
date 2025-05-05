@@ -32,7 +32,20 @@ export const PageLayout: FC<IPageLayoutProps> = ({ children, title }) => {
     });
   };
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = async () => {
+    await fetch(
+      `http://51.250.46.120:5006/api/push-tokens/${localStorage.getItem(
+        "FCMtoken"
+      )}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: localStorage.getItem("FCMtoken") }),
+      }
+    );
     logoutRedirect();
     localStorage.removeItem("userToken");
   };

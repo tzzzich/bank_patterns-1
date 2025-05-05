@@ -9,5 +9,63 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+      } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCLI4LT2iUD_DUXWgVAlFCwk9qUJPisq7Y",
+        authDomain: "acrchpat.firebaseapp.com",
+        projectId: "acrchpat",
+        storageBucket: "acrchpat.firebasestorage.app",
+        messagingSenderId: "173272763733",
+        appId: "1:173272763733:web:3b5f987f253ab23924b3dc",
+        measurementId: "G-HYM3E24SP2",
+      };
+      const VAPID =
+        "BCSArAN6c7AYyxs6TLuf23KOly6dVoRNOxa5YEohnMuYBXOZ3wPqR_WwwUHoGmVJM6nnIHlr6fouO0KnJgliivE";
+
+      const app = initializeApp(firebaseConfig);
+      const messaging = getMessaging(app);
+
+      const sw = await navigator.serviceWorker.register(
+        "./firebase-messaging-sw.js"
+      );
+
+      const token = await getToken(messaging, {
+        vapidKey: VAPID,
+        serviceWorkerRegistration: sw,
+      });
+      console.log("FCM-token:", token);
+      localStorage.setItem("FCMtoken", token);
+
+      await fetch("http://51.250.46.120:5006/api/push-tokens", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: token, role: "Client" }),
+      });
+
+      onTokenChanged(messaging, async (newTok) => {
+        await fetch("http://51.250.46.120:5006/api/push-tokens", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: newTok, role: "Client" }),
+        });
+      });
+
+      onMessage(messaging, ({ notification }) => {
+        alert(`Foreground push: ${notification.title} – ${notification.body}`);
+      });
+    </script>
   </body>
 </html>
