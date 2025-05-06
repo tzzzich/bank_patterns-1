@@ -9,6 +9,7 @@ export const fetchCloseAccount = async (id: string): Promise<null> => {
     headers: {
       Accept: "text/plain",
       Authorization: `Bearer ${token}`,
+      "Idempotency-Key": id,
     },
   });
 
