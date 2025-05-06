@@ -11,7 +11,8 @@ import { IPageLayoutProps } from "./PageLayout.interfaces";
 import { useStores } from "@shared/contexts/stores";
 import { useChangeTheme } from "@entities/Theme/hooks";
 import { TTheme } from "@entities/Theme/models";
-import { logoutRedirect } from "@shared/utils";
+import { loginRedirect, logoutRedirect } from "@shared/utils";
+import { Button } from "antd";
 
 export const PageLayout: FC<IPageLayoutProps> = ({ children, title }) => {
   const {
@@ -53,9 +54,14 @@ export const PageLayout: FC<IPageLayoutProps> = ({ children, title }) => {
   return (
     <>
       <Row>
-        <Logout onClick={handleLogoutClick}>Выйти</Logout>
+        {localStorage.getItem("userToken") ? (
+          <Logout onClick={handleLogoutClick}>Выйти</Logout>
+        ) : (
+          <Button onClick={loginRedirect}>Войти</Button>
+        )}
         <ThemeImage onClick={handleThemeClick} />
       </Row>
+
       <Wrapper>
         {/* {withNavigationHome && <NavigationHomeStyled />} */}
         <TitleStyled level={2}>{title}</TitleStyled>
