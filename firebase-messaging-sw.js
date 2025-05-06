@@ -22,3 +22,13 @@ messaging.onBackgroundMessage(({ notification }) => {
     icon: "/favicon.ico",
   });
 });
+
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+  try {
+    const src = event.data ? "FCM / DevTools‑JSON" : "DevTools‑empty";
+    console.log("[SW]", src);
+    const { title, body } = JSON.parse(event.data.text());
+    self.registration.showNotification(title ?? "DevTools", { body });
+  } catch {}
+});
